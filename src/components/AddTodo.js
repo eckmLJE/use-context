@@ -1,6 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 
-export default ({ dispatch }) => {
+export default () => {
+  
+  const dispatch = useContext(TodoContext)
+  
   const [task, setTask] = useState('')
 
   const handleSubmit = event => {

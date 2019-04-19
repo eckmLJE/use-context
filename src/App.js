@@ -1,9 +1,11 @@
-import React, { useReducer } from 'react'
+import React, { useReducer, createContext } from 'react'
 import uuid from 'uuid/v4'
 
 import Filter from './components/Filter'
 import TodoList from './components/TodoList'
 import AddTodo from './components/AddTodo'
+
+const ToDoContext = createContext(null)
 
 const initialTodos = [
   {
@@ -61,24 +63,21 @@ const App = () => {
     if (filter === 'ALL') {
       return true
     }
-
     if (filter === 'COMPLETE' && todo.complete) {
       return true
     }
-
     if (filter === 'INCOMPLETE' && !todo.complete) {
       return true
     }
-
     return false
   })
 
   return (
-    <div>
+    <ToDoContext.Provider value={dispatchTodos}>
       <Filter dispatch={dispatchFilter} />
-      <TodoList dispatch={dispatchTodos} todos={filteredTodos} />
-      <AddTodo dispatch={dispatchTodos} />
-    </div>
+      <TodoList todos={filteredTodos} />
+      <AddTodo />
+    </ToDoContext.Provider>
   )
 }
 
