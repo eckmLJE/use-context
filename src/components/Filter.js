@@ -1,6 +1,10 @@
-import React from 'react'
+import React, { useContext } from 'react'
 
-export default ({ dispatch }) => {
+import { DispatchContext } from '../App'
+
+export default () => {
+  const dispatch = useContext(DispatchContext)
+
   const handleShowAll = () => {
     dispatch({ type: 'SHOW_ALL' })
   }

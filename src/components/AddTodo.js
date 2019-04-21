@@ -1,9 +1,9 @@
 import React, { useState, useContext } from 'react'
+import { DispatchContext } from '../App'
 
 export default () => {
-  
-  const dispatch = useContext(TodoContext)
-  
+  const dispatch = useContext(DispatchContext)
+
   const [task, setTask] = useState('')
 
   const handleSubmit = event => {

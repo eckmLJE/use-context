@@ -1,13 +1,13 @@
 import React, { useReducer, createContext } from 'react'
 import uuid from 'uuid/v4'
 
+import AddTodo from './components/AddTodo'
 import Filter from './components/Filter'
 import TodoList from './components/TodoList'
-import AddTodo from './components/AddTodo'
 
-const ToDoContext = createContext(null)
+export const DispatchContext = createContext(null)
 
-const initialTodos = [
+const initalTodos = [
   {
     id: uuid(),
     task: 'Learn React',
@@ -25,23 +25,6 @@ const initialTodos = [
   },
 ]
 
-const todoReducer = (state, action) => {
-  switch (action.type) {
-    case 'DO_TODO':
-      return state.map(todo =>
-        todo.id === action.id ? { ...todo, complete: true } : todo
-      )
-    case 'UNDO_TODO':
-      return state.map(todo =>
-        todo.id === action.id ? { ...todo, complete: false } : todo
-      )
-    case 'ADD_TODO':
-      return [...state, { task: action.task, id: uuid(), complete: false }]
-    default:
-      throw new Error()
-  }
-}
-
 const filterReducer = (state, action) => {
   switch (action.type) {
     case 'SHOW_ALL':
@@ -51,33 +34,68 @@ const filterReducer = (state, action) => {
     case 'SHOW_INCOMPLETE':
       return 'INCOMPLETE'
     default:
-      throw new Error()
+      return state
+  }
+}
+
+const todoReducer = (state, action) => {
+  switch (action.type) {
+    case 'DO_TODO':
+      return state.map(todo => {
+        if (todo.id === action.id) {
+          return { ...todo, complete: true }
+        } else {
+          return todo
+        }
+      })
+    case 'UNDO_TODO':
+      return state.map(todo => {
+        if (todo.id === action.id) {
+          return { ...todo, complete: false }
+        } else {
+          return todo
+        }
+      })
+    case 'ADD_TODO':
+      return state.concat({
+        task: action.task,
+        id: uuid(),
+        complete: false,
+      })
+    default:
+      return state
   }
 }
 
 const App = () => {
   const [filter, dispatchFilter] = useReducer(filterReducer, 'ALL')
-  const [todos, dispatchTodos] = useReducer(todoReducer, initialTodos)
+  const [todos, dispatchTodos] = useReducer(todoReducer, initalTodos)
+
+  const dispatch = action =>
+    [dispatchTodos, dispatchFilter].forEach(fn => fn(action))
 
   const filteredTodos = todos.filter(todo => {
     if (filter === 'ALL') {
       return true
     }
+
     if (filter === 'COMPLETE' && todo.complete) {
       return true
     }
+
     if (filter === 'INCOMPLETE' && !todo.complete) {
       return true
     }
+
     return false
   })
 
   return (
-    <ToDoContext.Provider value={dispatchTodos}>
-      <Filter dispatch={dispatchFilter} />
+    <DispatchContext.Provider value={dispatch}>
+      <Filter />
       <TodoList todos={filteredTodos} />
       <AddTodo />
-    </ToDoContext.Provider>
+    </DispatchContext.Provider>
   )
 }
 
